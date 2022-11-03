@@ -5,18 +5,17 @@
  */
 package g4loginlogoutservidor;
 
-import classes.Factory;
 import classes.LoginLogout;
 import classes.Message;
 import classes.Type;
 import classes.User;
+import factories.FactoryServer;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.Date;
 
 /**
  *
@@ -40,7 +39,7 @@ public class G4LoginLogoutServidor {
             loginUser = msg.getUser();
             if (msg.getCallType().equals(msg.getCallType().LOGIN_REQUEST)) {
                 LoginLogout serverLoginLogout = null;
-                serverLoginLogout = Factory.getLoginLogout();
+                serverLoginLogout = FactoryServer.getLoginLogout();
               loginUser = serverLoginLogout.logIn(loginUser);
             }
             
