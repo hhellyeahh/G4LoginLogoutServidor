@@ -5,7 +5,8 @@
  */
 package factories;
 
-import classes.*;
+import DAO.ServerImplementation;
+import classes.LoginLogout;
 import exceptions.UnknownModelTypeException;
 import java.util.ResourceBundle;
 
@@ -24,13 +25,10 @@ public class FactoryServer {
      */
     public static LoginLogout getLoginLogout() throws UnknownModelTypeException {
 
-        switch (ResourceBundle.getBundle("config").getString("LOGINLOGOUT")) {
-            case "SERVER":
+        
                 data = new ServerImplementation();
-                break;
-            default:
-                throw new UnknownModelTypeException("That type of model is not valid.");
-        }
+                
+        
         return data;
     }
 }
