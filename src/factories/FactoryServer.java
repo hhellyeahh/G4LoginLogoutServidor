@@ -5,10 +5,9 @@
  */
 package factories;
 
-import DAO.ServerImplementation;
+import dao.ServerImplementation;
 import classes.LoginLogout;
 import exceptions.UnknownModelTypeException;
-import java.util.ResourceBundle;
 
 /**
  *
