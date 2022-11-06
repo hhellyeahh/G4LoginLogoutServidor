@@ -27,13 +27,16 @@ public class SocketConnectionThread extends Thread {
     private ObjectOutputStream outputStream = null;
     private User user;
     private Message msg;
+    private LoginLogout DAO;
 
     public SocketConnectionThread() {
 
     }
 
-    public SocketConnectionThread(Socket skCLiente) {
+    public SocketConnectionThread(Socket skCLiente, LoginLogout DAO) {
         this.skCliente = skCLiente;
+        this.DAO = DAO;
+        this.start();
     }
 
     @Override
@@ -49,7 +52,6 @@ public class SocketConnectionThread extends Thread {
 
             //Get user from message
             user = msg.getUser();
-            LoginLogout serverLoginLogout = FactoryServer.getLoginLogout();
 
             //Interpretate the call type
             switch (msg.getCallType()) {
@@ -57,10 +59,10 @@ public class SocketConnectionThread extends Thread {
                 case LOGIN_REQUEST:
 
                     //LLAMAR AL DAO
-                    user = serverLoginLogout.logIn(user);
+                    user = DAO.logIn(user);
                     break;
                 case SIGNUP_REQUEST:
-                    user = serverLoginLogout.signUp(user);
+                    user = DAO.signUp(user);
                     break;
             }
 
