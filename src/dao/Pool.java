@@ -15,8 +15,8 @@ import java.util.Stack;
  */
 public class Pool {
 
-    private Pool pool;
-    private Stack connections;
+    private static Pool pool;
+    private static Stack connections;
 
     private Pool() {
         connections = new Stack();
@@ -26,7 +26,7 @@ public class Pool {
      *
      * @return pool
      */
-    public Pool getPool() {
+    public static Pool getPool() {
         if (pool == null) {
             pool = new Pool();
         }
@@ -37,7 +37,7 @@ public class Pool {
      *
      * @param con
      */
-    public void returnConnection(Connection con) {
+    public static void returnConnection(Connection con) {
         connections.push(con);
     }
 
@@ -45,7 +45,7 @@ public class Pool {
      *
      * @return con
      */
-    public Connection getConnection() {
+    public static Connection getConnection() {
         Connection con = (Connection) connections.pop();
         return con;
     }
