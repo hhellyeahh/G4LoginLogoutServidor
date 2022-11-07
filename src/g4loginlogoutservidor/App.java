@@ -13,7 +13,7 @@ import java.util.logging.Logger;
  *
  * @author unaiz
  */
-public class App extends Thread{
+public class App extends Thread {
 
     private static boolean on = true;
     private static final Logger LOGGER = Logger.getLogger(App.class.getName());
@@ -21,6 +21,7 @@ public class App extends Thread{
     public static void main(String[] args) {
 
         G4LoginLogoutServidor server = new G4LoginLogoutServidor();
+        server.start();
 
         while (on) {
             LOGGER.info("ESCRIBA EXIT PARA CERRAR EL SERVER");
@@ -30,9 +31,8 @@ public class App extends Thread{
                 on = false;
             }
         }
-      LOGGER.info("Servidor cerrado");
-  exit(0);
+        LOGGER.info("Servidor cerrado");
+        exit(0);
 
     }
-  
 }

@@ -27,15 +27,14 @@ public class SocketConnectionThread extends Thread {
     private ObjectOutputStream outputStream = null;
     private User user;
     private Message msg;
-    private LoginLogout DAO;
+    private LoginLogout dao;
 
     public SocketConnectionThread() {
-
     }
 
-    public SocketConnectionThread(Socket skCLiente, LoginLogout DAO) {
+    public SocketConnectionThread(Socket skCLiente, LoginLogout dao) {
         this.skCliente = skCLiente;
-        this.DAO = DAO;
+        this.dao = dao;
         this.start();
     }
 
@@ -55,14 +54,12 @@ public class SocketConnectionThread extends Thread {
 
             //Interpretate the call type
             switch (msg.getCallType()) {
-
                 case LOGIN_REQUEST:
-
-                    //LLAMAR AL DAO
-                    user = DAO.logIn(user);
+                    //LLAMAR AL dao
+                    user = dao.logIn(user);
                     break;
                 case SIGNUP_REQUEST:
-                    user = DAO.signUp(user);
+                    user = dao.signUp(user);
                     break;
             }
 
@@ -86,6 +83,7 @@ public class SocketConnectionThread extends Thread {
                 outputStream.writeObject(msg);
                 outputStream.close();
                 inputStream.close();
+                G4LoginLogoutServidor.removeClient(this);
                 skCliente.close();
             } catch (IOException ex) {
                 Logger.getLogger(G4LoginLogoutServidor.class.getName()).log(Level.SEVERE, null, ex);

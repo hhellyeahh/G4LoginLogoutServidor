@@ -23,11 +23,7 @@ public class FactoryServer {
      * @return data LoginLogout
      */
     public static LoginLogout getLoginLogout() throws UnknownModelTypeException {
-
-        
-                data = new ServerImplementation();
-                
-        
+        data = new ServerImplementation();
         return data;
     }
 }

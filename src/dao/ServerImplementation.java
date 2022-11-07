@@ -28,25 +28,23 @@ public class ServerImplementation implements LoginLogout {
     private Connection con = null;
     private PreparedStatement stmt;
     private final ConnectionOpenClose conection = new ConnectionOpenClose();
-    private final String SEARCHUser ="SELECT * from retologinlogout.user where login = ? and userPassword = ?" ;
+    private final String SEARCHUser = "SELECT * from retologinlogout.user where login = ? and userPassword = ?";
     private final String createUserSQL = "{CALL createUser(?,?,?,?,?,?)}";
-               /**
-                * INSERT INTO retologinlogout.USER VALUES( null, "zuliyaki",
-                * "abcd*1234", "zuluagaunai@gmail.com" , "Unai Zuluaga Ruiz",
-                * "ENABLE", "ADMIN", now())
-                */
+
+    /**
+     * INSERT INTO retologinlogout.USER VALUES( null, "zuliyaki", "abcd*1234",
+     * "zuluagaunai@gmail.com" , "Unai Zuluaga Ruiz", "ENABLE", "ADMIN", now())
+     */
     @Override
-    public User logIn(User user)throws IncorrectLoginException, ServerException, UnknownTypeException {
+    public User logIn(User user) throws IncorrectLoginException, ServerException, UnknownTypeException {
 
         ResultSet rs = null;
         User loginUser = user;
-      
 
         con = conection.openConnection();
-        if(con == null){
+        if (con == null) {
             System.out.println("tuki");
         }
-       
 
         try {
             stmt = con.prepareStatement(SEARCHUser);
@@ -59,9 +57,8 @@ public class ServerImplementation implements LoginLogout {
                 loginUser.setEmail(rs.getString("email"));
                 loginUser.setFullName(rs.getString("fullName"));
                 loginUser.setLastPasswordChange(rs.getTimestamp("lastPasswordChange"));
-               
-                
-                   UserPrivilege userPrivilege = null;
+
+                UserPrivilege userPrivilege = null;
                 for (UserPrivilege a : UserPrivilege.values()) {
                     if (a.ordinal() == rs.getInt("userPrivilege")) {
                         userPrivilege = a;
@@ -76,8 +73,6 @@ public class ServerImplementation implements LoginLogout {
                     }
                 }
                 loginUser.setStatus(userStatus);
-                
-               
 
             } else {
                 throw new IncorrectLoginException("Login Incorrecto");
@@ -96,7 +91,7 @@ public class ServerImplementation implements LoginLogout {
 
         // Abrimos la conexión
         con = conection.openConnection();
-         try {
+        try {
             stmt = con.prepareCall(createUserSQL);
             stmt.setString(1, userRegister.getLogin());
             stmt.setString(2, userRegister.getPassword());
@@ -104,13 +99,13 @@ public class ServerImplementation implements LoginLogout {
             stmt.setString(4, userRegister.getFullName());
             stmt.setInt(5, userRegister.getStatus().ordinal());
             stmt.setInt(6, userRegister.getPrivilege().ordinal());
-            
+
             stmt.execute();
-            
+
             stmt.close();
         } catch (SQLException ex) {
             Logger.getLogger(ServerImplementation.class.getName()).log(Level.SEVERE, null, ex);
-          throw new ServerException(ex.getMessage());
+            throw new ServerException(ex.getMessage());
         }
 
         return userRegister;

@@ -24,6 +24,7 @@ import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -33,10 +34,11 @@ import java.util.logging.Logger;
  */
 public class G4LoginLogoutServidor extends Thread {
 
-    private Integer PUERTO = 5000;
+    private ResourceBundle configFile = ResourceBundle.getBundle("config.config");
+    private Integer PUERTO = Integer.parseInt(configFile.getString("PORT"));
+    private Integer MaxUsers = Integer.parseInt(configFile.getString("MAXUSERS"));
     private static Boolean serverRunning = true;
-    private Integer MaxUsers = 10;
-    private static ArrayList<SocketConnectionThread> actualConections = new ArrayList<>();
+    protected static ArrayList<SocketConnectionThread> actualConections = new ArrayList<>();
 
     /**
      * @param args the command line arguments
@@ -55,16 +57,16 @@ public class G4LoginLogoutServidor extends Thread {
                     skCliente = skServidor.accept();
                     //Crear hilo pasándole el Socket skCliente
                     SocketConnectionThread socketConnectionThread = new SocketConnectionThread(skCliente, FactoryServer.getLoginLogout());
-                    //Añadimos user all array 
+                    //Añadimos hilo all array 
                     actualConections.add(socketConnectionThread);
-                }else{
-                               //aceptamos conection             
+                } else {
+                    //aceptamos conection             
                     skCliente = skServidor.accept();
                     //devolvemos un error al cliente con que no se aceptan mas peticiones
-                     ObjectOutputStream oos = new ObjectOutputStream(skCliente.getOutputStream());
-                     Message msg = new Message(Type.MAX_USERS_EXCEPTION);
-                     oos.writeObject(msg);
-                     
+                    ObjectOutputStream oos = new ObjectOutputStream(skCliente.getOutputStream());
+                    Message msg = new Message(Type.MAX_USERS_EXCEPTION);
+                    oos.writeObject(msg);
+
                 }
             }
             //  cuando se cierra el servidor se cierra
@@ -75,12 +77,16 @@ public class G4LoginLogoutServidor extends Thread {
         } catch (UnknownModelTypeException ex) {
             Logger.getLogger(G4LoginLogoutServidor.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
-        
+
+    }
+
+    public static void setServerOn(boolean serverRunning) {
+        serverRunning = serverRunning;
     }
     
-          public static void setServerOn(boolean serverRunning) {
-            serverRunning = serverRunning;
+    //metodo para quitar el hilo del usuario del array que se llama al terminar el DAO
+    public static void removeClient(SocketConnectionThread socketConnectionThread){
+        actualConections.remove(socketConnectionThread);
     }
 
 }
