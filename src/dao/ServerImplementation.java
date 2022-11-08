@@ -34,7 +34,7 @@ public class ServerImplementation implements LoginLogout {
     private final String createUserSQL = "{CALL createUser(?,?,?,?,?,?)}";
 
     private static final ResourceBundle CONFIG = ResourceBundle.getBundle("config.config");
-    private static final int MAXIMUM_USERS = Integer.parseInt(CONFIG.getString("MAXIMUMUSERS"));
+    private static final int MAXIMUM_USERS = Integer.parseInt(CONFIG.getString("MAXUSERS"));
 
     //TODO
     public ServerImplementation() {
