@@ -11,7 +11,7 @@ import java.util.logging.Logger;
 
 /**
  *
- * @author unaiz
+ * @author unaiz, gontzal
  */
 public class App extends Thread {
 
@@ -32,7 +32,7 @@ public class App extends Thread {
             }
         }
         LOGGER.info("Servidor cerrado");
-        exit(0);
+       
 
     }
 }

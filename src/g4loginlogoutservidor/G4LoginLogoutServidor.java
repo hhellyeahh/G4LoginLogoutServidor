@@ -30,7 +30,8 @@ import java.util.logging.Logger;
 
 /**
  *
- * @author 2dam
+ * @author unaiz, gontzal
+
  */
 public class G4LoginLogoutServidor extends Thread {
 
