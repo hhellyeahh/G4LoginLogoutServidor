@@ -31,13 +31,13 @@ import java.util.logging.Logger;
 /**
  *
  * @author unaiz, gontzal
-
+ *
  */
 public class G4LoginLogoutServidor extends Thread {
 
     private ResourceBundle configFile = ResourceBundle.getBundle("config.config");
     private Integer PUERTO = Integer.parseInt(configFile.getString("PORT"));
-    private Integer MaxUsers = Integer.parseInt(configFile.getString("MAXUSERS"));
+    private Integer MAXUSERS = Integer.parseInt(configFile.getString("MAXUSERS"));
     private static Boolean serverRunning = true;
     protected static ArrayList<SocketConnectionThread> actualConections = new ArrayList<>();
 
@@ -53,13 +53,13 @@ public class G4LoginLogoutServidor extends Thread {
             // BUCLE 
             while (serverRunning) {
                 //Preguntar si no ha superado el limite
-                if (actualConections.size() < MaxUsers) {
+                if (actualConections.size() < MAXUSERS) {
                     //Accept connection
                     skCliente = skServidor.accept();
                     //Crear hilo pasándole el Socket skCliente
                     SocketConnectionThread socketConnectionThread = new SocketConnectionThread(skCliente, FactoryServer.getLoginLogout());
                     //Añadimos hilo all array 
-                    actualConections.add(socketConnectionThread);
+                    addClient(socketConnectionThread);
                 } else {
                     //aceptamos conection             
                     skCliente = skServidor.accept();
@@ -84,9 +84,14 @@ public class G4LoginLogoutServidor extends Thread {
     public static void setServerOn(boolean serverRunning) {
         serverRunning = serverRunning;
     }
-    
+
+    //metodo para meter el hilo del usuario del array que se llama al terminar el DAO
+    public static synchronized void addClient(SocketConnectionThread socketConnectionThread) {
+        actualConections.add(socketConnectionThread);
+    }
+
     //metodo para quitar el hilo del usuario del array que se llama al terminar el DAO
-    public static void removeClient(SocketConnectionThread socketConnectionThread){
+    public static synchronized void removeClient(SocketConnectionThread socketConnectionThread) {
         actualConections.remove(socketConnectionThread);
     }
 
