@@ -14,6 +14,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -23,11 +24,23 @@ import java.util.logging.Logger;
  */
 public class ServerImplementation implements LoginLogout {
 
+    private Pool pool;
     private Connection con = null;
+    private ConnectionUsed conU;
     private PreparedStatement stmt;
-    private final ConnectionOpenClose conection = new ConnectionOpenClose();
+
+    private ConnectionOpenClose conection = new ConnectionOpenClose();
     private final String SEARCHUser = "SELECT * from retologinlogout.user where login = ? and userPassword = ?";
     private final String createUserSQL = "{CALL createUser(?,?,?,?,?,?)}";
+
+    private static final ResourceBundle CONFIG = ResourceBundle.getBundle("config.config");
+    private static final int MAXIMUM_USERS = Integer.parseInt(CONFIG.getString("MAXIMUMUSERS"));
+
+    //TODO
+    public ServerImplementation() {
+        pool.getPool();
+        conection = new ConnectionOpenClose();
+    }
 
     /**
      * INSERT INTO retologinlogout.USER VALUES( null, "zuliyaki", "abcd*1234",
@@ -45,6 +58,10 @@ public class ServerImplementation implements LoginLogout {
         }
 
         try {
+
+            //TODO
+            getPoolConnection();
+
             stmt = con.prepareStatement(SEARCHUser);
             stmt.setString(1, loginUser.getLogin());
             stmt.setString(2, loginUser.getPassword());
@@ -75,6 +92,12 @@ public class ServerImplementation implements LoginLogout {
             } else {
                 throw new IncorrectLoginException("Login Incorrecto");
             }
+
+            //TODO
+            rs.close();
+            stmt.close();
+            releaseConnection();
+
         } catch (SQLException ex) {
             Logger.getLogger(ServerImplementation.class.getName()).log(Level.SEVERE, null, ex);
             throw new ServerException(ex.getMessage());
@@ -90,6 +113,9 @@ public class ServerImplementation implements LoginLogout {
         // Abrimos la conexión
         con = conection.openConnection();
         try {
+            //TODO 
+            getPoolConnection();
+
             stmt = con.prepareCall(createUserSQL);
             stmt.setString(1, userRegister.getLogin());
             stmt.setString(2, userRegister.getPassword());
@@ -101,6 +127,9 @@ public class ServerImplementation implements LoginLogout {
             stmt.execute();
 
             stmt.close();
+
+            //TODO
+            releaseConnection();
         } catch (SQLException ex) {
             Logger.getLogger(ServerImplementation.class.getName()).log(Level.SEVERE, null, ex);
             throw new ServerException(ex.getMessage());
@@ -108,6 +137,22 @@ public class ServerImplementation implements LoginLogout {
 
         return userRegister;
 
+    }
+
+    //TODO
+    public void releaseConnection() {
+        pool.returnConnection(con);
+        conU.setUsed(false);
+    }
+
+    //TODO
+    public void getPoolConnection() throws SQLException {
+        if (pool.getConnectionSize() < MAXIMUM_USERS) {
+            con = conection.openConnection();
+        } else {
+            con = pool.getConnection().getCon();
+        }
+        conU.setUsed(true);
     }
 
 }
