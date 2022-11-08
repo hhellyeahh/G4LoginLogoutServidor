@@ -18,7 +18,8 @@ import java.util.logging.Logger;
 
 /**
  *
- * @author 2dam
+ * @author unaiz, gontzal
+ * 
  */
 public class SocketConnectionThread extends Thread {
 
@@ -27,13 +28,15 @@ public class SocketConnectionThread extends Thread {
     private ObjectOutputStream outputStream = null;
     private User user;
     private Message msg;
+    private LoginLogout dao;
 
     public SocketConnectionThread() {
-
     }
 
-    public SocketConnectionThread(Socket skCLiente) {
+    public SocketConnectionThread(Socket skCLiente, LoginLogout dao) {
         this.skCliente = skCLiente;
+        this.dao = dao;
+        this.start();
     }
 
     @Override
@@ -49,18 +52,15 @@ public class SocketConnectionThread extends Thread {
 
             //Get user from message
             user = msg.getUser();
-            LoginLogout serverLoginLogout = FactoryServer.getLoginLogout();
 
             //Interpretate the call type
             switch (msg.getCallType()) {
-
                 case LOGIN_REQUEST:
-
-                    //LLAMAR AL DAO
-                    user = serverLoginLogout.logIn(user);
+                    //LLAMAR AL dao
+                    user = dao.logIn(user);
                     break;
                 case SIGNUP_REQUEST:
-                    user = serverLoginLogout.signUp(user);
+                    user = dao.signUp(user);
                     break;
             }
 
@@ -84,6 +84,7 @@ public class SocketConnectionThread extends Thread {
                 outputStream.writeObject(msg);
                 outputStream.close();
                 inputStream.close();
+                G4LoginLogoutServidor.removeClient(this);
                 skCliente.close();
             } catch (IOException ex) {
                 Logger.getLogger(G4LoginLogoutServidor.class.getName()).log(Level.SEVERE, null, ex);

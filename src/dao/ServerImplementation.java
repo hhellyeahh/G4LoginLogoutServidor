@@ -28,6 +28,7 @@ public class ServerImplementation implements LoginLogout {
     private Connection con = null;
     private ConnectionUsed conU;
     private PreparedStatement stmt;
+
     private ConnectionOpenClose conection = new ConnectionOpenClose();
     private final String SEARCHUser = "SELECT * from retologinlogout.user where login = ? and userPassword = ?";
     private final String createUserSQL = "{CALL createUser(?,?,?,?,?,?)}";
