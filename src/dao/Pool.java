@@ -7,7 +7,8 @@ package dao;
 
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.Stack;
+import java.util.ArrayDeque;
+import java.util.Deque;
 
 /**
  *
@@ -16,10 +17,11 @@ import java.util.Stack;
 public class Pool {
 
     private static Pool pool;
-    private static Stack connections;
+    private static ConnectionUsed conU;
+    private static Deque<ConnectionUsed> connections = new ArrayDeque<ConnectionUsed>();
 
     private Pool() {
-        connections = new Stack();
+        connections = new ArrayDeque();
     }
 
     /**
@@ -38,15 +40,16 @@ public class Pool {
      * @param con
      */
     public static void returnConnection(Connection con) {
-        connections.push(con);
+        conU.setCon(con);
+        connections.push(conU);
     }
 
     /**
      *
      * @return con
      */
-    public static Connection getConnection() {
-        Connection con = (Connection) connections.pop();
+    public static ConnectionUsed getConnection() {
+        ConnectionUsed con = connections.pop();
         return con;
     }
 
@@ -64,8 +67,8 @@ public class Pool {
      */
     public void closePool() throws SQLException {
         for (int i = 0; i < connections.size(); i++) {
-            Connection con = getConnection();
-            con.close();
+            ConnectionUsed con = getConnection();
+            con.getCon().close();
         }
     }
 }
