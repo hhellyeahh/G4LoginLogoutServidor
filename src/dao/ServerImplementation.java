@@ -26,25 +26,30 @@ public class ServerImplementation implements LoginLogout {
 
     private Pool pool;
     private Connection con = null;
-    private ConnectionUsed conU;
+    private ConnectionOpenClose conOpCl;
     private PreparedStatement stmt;
 
-    private ConnectionOpenClose conection = new ConnectionOpenClose();
     private final String SEARCHUser = "SELECT * from retologinlogout.user where login = ? and userPassword = ?";
     private final String createUserSQL = "{CALL createUser(?,?,?,?,?,?)}";
 
     private static final ResourceBundle CONFIG = ResourceBundle.getBundle("config.config");
     private static final int MAXIMUM_USERS = Integer.parseInt(CONFIG.getString("MAXUSERS"));
 
-    //TODO
+    /**
+     * Constructor initializating the pool and the connection
+     */
     public ServerImplementation() {
-        pool.getPool();
-        conection = new ConnectionOpenClose();
+        this.pool = Pool.getPool();
+        this.conOpCl = new ConnectionOpenClose();
     }
 
     /**
-     * INSERT INTO retologinlogout.USER VALUES( null, "zuliyaki", "abcd*1234",
-     * "zuluagaunai@gmail.com" , "Unai Zuluaga Ruiz", "ENABLE", "ADMIN", now())
+     * 
+     * @param user
+     * @return
+     * @throws IncorrectLoginException
+     * @throws ServerException
+     * @throws UnknownTypeException 
      */
     @Override
     public User logIn(User user) throws IncorrectLoginException, ServerException, UnknownTypeException {
@@ -52,7 +57,11 @@ public class ServerImplementation implements LoginLogout {
         ResultSet rs = null;
         User loginUser = user;
 
-        con = conection.openConnection();
+        try {
+            con = getPoolConnection();
+        } catch (SQLException ex) {
+            Logger.getLogger(ServerImplementation.class.getName()).log(Level.SEVERE, null, ex);
+        }
         if (con == null) {
             System.out.println("tuki");
         }
@@ -60,8 +69,6 @@ public class ServerImplementation implements LoginLogout {
         try {
 
             //TODO
-            getPoolConnection();
-
             stmt = con.prepareStatement(SEARCHUser);
             stmt.setString(1, loginUser.getLogin());
             stmt.setString(2, loginUser.getPassword());
@@ -93,7 +100,6 @@ public class ServerImplementation implements LoginLogout {
                 throw new IncorrectLoginException("Login Incorrecto");
             }
 
-            //TODO
             rs.close();
             stmt.close();
             releaseConnection();
@@ -106,16 +112,25 @@ public class ServerImplementation implements LoginLogout {
         return loginUser;
     }
 
+    /**
+     * 
+     * @param user
+     * @return
+     * @throws ServerException
+     * @throws UserAlreadyExistExpection
+     * @throws UnknownTypeException 
+     */
     @Override
     public User signUp(User user) throws ServerException, UserAlreadyExistExpection, UnknownTypeException {
         User userRegister = user;
 
-        // Abrimos la conexión
-        con = conection.openConnection();
         try {
-            //TODO 
-            getPoolConnection();
-
+            // Abrimos la conexión
+            con = getPoolConnection();
+        } catch (SQLException ex) {
+            Logger.getLogger(ServerImplementation.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        try {
             stmt = con.prepareCall(createUserSQL);
             stmt.setString(1, userRegister.getLogin());
             stmt.setString(2, userRegister.getPassword());
@@ -128,7 +143,6 @@ public class ServerImplementation implements LoginLogout {
 
             stmt.close();
 
-            //TODO
             releaseConnection();
         } catch (SQLException ex) {
             Logger.getLogger(ServerImplementation.class.getName()).log(Level.SEVERE, null, ex);
@@ -139,20 +153,23 @@ public class ServerImplementation implements LoginLogout {
 
     }
 
-    //TODO
+    /**
+     * 
+     */
     public void releaseConnection() {
         pool.returnConnection(con);
-        conU.setUsed(false);
     }
 
-    //TODO
-    public void getPoolConnection() throws SQLException {
-        if (pool.getConnectionSize() < MAXIMUM_USERS) {
-            con = conection.openConnection();
+    /**
+     * 
+     * @return
+     * @throws SQLException 
+     */
+    public Connection getPoolConnection() throws SQLException {
+        if (pool.getConnections() < MAXIMUM_USERS) {
+            return conOpCl.openConnection();
         } else {
-            con = pool.getConnection().getCon();
+            return pool.getConnection();
         }
-        conU.setUsed(true);
     }
-
 }

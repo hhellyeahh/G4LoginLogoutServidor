@@ -18,8 +18,8 @@ import java.util.logging.Logger;
 
 /**
  *
- * @author unaiz, gontzal
- * 
+ * @author unaiz
+ *
  */
 public class SocketConnectionThread extends Thread {
 
@@ -60,7 +60,10 @@ public class SocketConnectionThread extends Thread {
                     user = dao.logIn(user);
                     break;
                 case SIGNUP_REQUEST:
-                    user = dao.signUp(user);
+                    if (dao.logIn(user) == null) {
+                        user = dao.signUp(user);
+                    } else 
+                        throw new UserAlreadyExistExpection();
                     break;
             }
 
@@ -91,5 +94,18 @@ public class SocketConnectionThread extends Thread {
             }
         }
 
+    }
+
+    public void close() throws IOException {
+        if (!skCliente.isClosed()) {
+            if (inputStream != null) {
+                inputStream.close();
+            }
+            if (outputStream != null) {
+                outputStream.close();
+            }
+            skCliente.close();
+
+        }
     }
 }

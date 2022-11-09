@@ -32,7 +32,6 @@ public class App extends Thread {
             }
         }
         LOGGER.info("Servidor cerrado");
-       
-
+        exit(0);
     }
 }

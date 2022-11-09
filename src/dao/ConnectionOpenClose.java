@@ -22,7 +22,6 @@ public class ConnectionOpenClose {
     protected String user;
     protected String pass;
     protected Connection con;
-    protected PreparedStatement stmt;
 
     public ConnectionOpenClose() {
         configFile = ResourceBundle.getBundle("config.config");
