@@ -20,7 +20,7 @@ import java.util.logging.Logger;
 
 /**
  *
- * @author 2dam
+ * @author Zuli & Unai B
  */
 public class ServerImplementation implements LoginLogout {
 
@@ -30,7 +30,8 @@ public class ServerImplementation implements LoginLogout {
     private PreparedStatement stmt;
 
     private final String SEARCHUser = "SELECT * from retologinlogout.user where login = ? and userPassword = ?";
-    private final String createUserSQL = "{CALL createUser(?,?,?,?,?,?)}";
+    private final String UserEXISTS = "SELECT * from retologinlogout.user where login = ?";
+    private final String CREATEUserSQL = "{CALL createUser(?,?,?,?,?,?)}";
 
     private static final ResourceBundle CONFIG = ResourceBundle.getBundle("config.config");
     private static final int MAXIMUM_USERS = Integer.parseInt(CONFIG.getString("MAXUSERS"));
@@ -44,12 +45,12 @@ public class ServerImplementation implements LoginLogout {
     }
 
     /**
-     * 
+     *
      * @param user
      * @return
      * @throws IncorrectLoginException
      * @throws ServerException
-     * @throws UnknownTypeException 
+     * @throws UnknownTypeException
      */
     @Override
     public User logIn(User user) throws IncorrectLoginException, ServerException, UnknownTypeException {
@@ -57,18 +58,10 @@ public class ServerImplementation implements LoginLogout {
         ResultSet rs = null;
         User loginUser = user;
 
-        try {
-            con = getPoolConnection();
-        } catch (SQLException ex) {
-            Logger.getLogger(ServerImplementation.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        if (con == null) {
-            System.out.println("tuki");
-        }
+        con = pool.getConnection();
 
         try {
 
-            //TODO
             stmt = con.prepareStatement(SEARCHUser);
             stmt.setString(1, loginUser.getLogin());
             stmt.setString(2, loginUser.getPassword());
@@ -97,12 +90,12 @@ public class ServerImplementation implements LoginLogout {
                 loginUser.setStatus(userStatus);
 
             } else {
-                throw new IncorrectLoginException("Login Incorrecto");
+                throw new IncorrectLoginException("Incorrect login");
             }
 
             rs.close();
             stmt.close();
-            releaseConnection();
+            pool.returnConnection(con);
 
         } catch (SQLException ex) {
             Logger.getLogger(ServerImplementation.class.getName()).log(Level.SEVERE, null, ex);
@@ -113,37 +106,44 @@ public class ServerImplementation implements LoginLogout {
     }
 
     /**
-     * 
+     *
      * @param user
      * @return
      * @throws ServerException
      * @throws UserAlreadyExistExpection
-     * @throws UnknownTypeException 
+     * @throws UnknownTypeException
      */
     @Override
     public User signUp(User user) throws ServerException, UserAlreadyExistExpection, UnknownTypeException {
+        ResultSet rs = null;
         User userRegister = user;
 
+        // Abrimos la conexión
+        con = pool.getConnection();
         try {
-            // Abrimos la conexión
-            con = getPoolConnection();
-        } catch (SQLException ex) {
-            Logger.getLogger(ServerImplementation.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        try {
-            stmt = con.prepareCall(createUserSQL);
+            // Comprobar que el usuario no existe
+            stmt = con.prepareStatement(UserEXISTS);
             stmt.setString(1, userRegister.getLogin());
-            stmt.setString(2, userRegister.getPassword());
-            stmt.setString(3, userRegister.getEmail());
-            stmt.setString(4, userRegister.getFullName());
-            stmt.setInt(5, userRegister.getStatus().ordinal());
-            stmt.setInt(6, userRegister.getPrivilege().ordinal());
+            rs = stmt.executeQuery();
 
-            stmt.execute();
+            // Si existe sale por el error, si no ejecuta la procedura
+            if (!rs.next()) {
+                stmt = con.prepareCall(CREATEUserSQL);
+                stmt.setString(1, userRegister.getLogin());
+                stmt.setString(2, userRegister.getPassword());
+                stmt.setString(3, userRegister.getEmail());
+                stmt.setString(4, userRegister.getFullName());
+                stmt.setInt(5, userRegister.getStatus().ordinal());
+                stmt.setInt(6, userRegister.getPrivilege().ordinal());
 
-            stmt.close();
+                stmt.execute();
 
-            releaseConnection();
+                stmt.close();
+
+                pool.returnConnection(con);
+            } else {
+                throw new UserAlreadyExistExpection("User already exists");
+            }
         } catch (SQLException ex) {
             Logger.getLogger(ServerImplementation.class.getName()).log(Level.SEVERE, null, ex);
             throw new ServerException(ex.getMessage());
@@ -151,25 +151,5 @@ public class ServerImplementation implements LoginLogout {
 
         return userRegister;
 
-    }
-
-    /**
-     * 
-     */
-    public void releaseConnection() {
-        pool.returnConnection(con);
-    }
-
-    /**
-     * 
-     * @return
-     * @throws SQLException 
-     */
-    public Connection getPoolConnection() throws SQLException {
-        if (pool.getConnections() < MAXIMUM_USERS) {
-            return conOpCl.openConnection();
-        } else {
-            return pool.getConnection();
-        }
     }
 }

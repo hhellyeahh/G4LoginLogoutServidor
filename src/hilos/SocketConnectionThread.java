@@ -60,10 +60,8 @@ public class SocketConnectionThread extends Thread {
                     user = dao.logIn(user);
                     break;
                 case SIGNUP_REQUEST:
-                    if (dao.logIn(user) == null) {
-                        user = dao.signUp(user);
-                    } else 
-                        throw new UserAlreadyExistExpection();
+                    //LLAMAR AL dao
+                    user = dao.signUp(user);
                     break;
             }
 
@@ -72,10 +70,6 @@ public class SocketConnectionThread extends Thread {
             msg.setCallType(Type.OKAY_RESPONSE);
             msg.setUser(user);
 
-            /**
-             * if (user == null) {
-             * msg.setCallType(Type.INCORRECT_LOGIN_RESPONSE); }
-             */
         } catch (IncorrectLoginException e) {
             msg.setCallType(Type.INCORRECT_LOGIN_RESPONSE);
         } catch (UserAlreadyExistExpection e) {
@@ -105,7 +99,6 @@ public class SocketConnectionThread extends Thread {
                 outputStream.close();
             }
             skCliente.close();
-
         }
     }
 }

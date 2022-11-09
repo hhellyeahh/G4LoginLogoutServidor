@@ -5,23 +5,14 @@
  */
 package g4loginlogoutservidor;
 
-import classes.LoginLogout;
 import classes.Message;
 import classes.Type;
-import classes.User;
 import dao.Pool;
-import dao.ServerImplementation;
-import exceptions.IncorrectLoginException;
-import exceptions.ServerException;
 import exceptions.UnknownModelTypeException;
-import exceptions.UserAlreadyExistExpection;
 import factories.FactoryServer;
 import hilos.SocketConnectionThread;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.sql.SQLException;
@@ -37,15 +28,15 @@ import java.util.logging.Logger;
  */
 public class G4LoginLogoutServidor extends Thread {
 
-    private ResourceBundle configFile = ResourceBundle.getBundle("config.config");
-    private Integer PUERTO = Integer.parseInt(configFile.getString("PORT"));
-    private Integer MAXUSERS = Integer.parseInt(configFile.getString("MAXUSERS"));
+    private final ResourceBundle configFile = ResourceBundle.getBundle("config.config");
+    private final Integer PUERTO = Integer.parseInt(configFile.getString("PORT"));
+    private final Integer MAXUSERS = Integer.parseInt(configFile.getString("MAXUSERS"));
     private static Boolean serverRunning = true;
     private static ServerSocket skServidor;
     protected static ArrayList<SocketConnectionThread> actualConections = new ArrayList<>();
 
     /**
-     * 
+     *
      */
     public void run() {
 

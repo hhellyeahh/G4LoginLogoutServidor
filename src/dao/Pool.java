@@ -6,21 +6,17 @@
 package dao;
 
 import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.ArrayDeque;
-import java.util.Deque;
-import java.util.ResourceBundle;
 import java.util.Stack;
 
 /**
  *
- * @author Leire & Unai
+ * @author Leire & Unai B & Zuli
  */
 public class Pool {
 
     private static Pool pool;
-    private static Stack stack = new Stack();
+    private static Stack<Connection> stack = new Stack();
 
     /**
      *
@@ -46,9 +42,16 @@ public class Pool {
      * @return con
      */
     public static Connection getConnection() {
-        return (Connection) stack.pop();
+        Connection con = null;
+        if (stack.size() > 0) {
+            con = stack.pop();
+        } else {
+            ConnectionOpenClose conOpCl = new ConnectionOpenClose();
+            con = conOpCl.openConnection();
+        }
+        return con;
     }
-    
+
     /**
      *
      * @return con

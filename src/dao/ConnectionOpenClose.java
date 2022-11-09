@@ -14,6 +14,8 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ResourceBundle;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class ConnectionOpenClose {
 
@@ -35,7 +37,7 @@ public class ConnectionOpenClose {
         try {
             con = DriverManager.getConnection(url, user, pass);
         } catch (SQLException e) {
-            e.printStackTrace();
+            Logger.getLogger(ConnectionOpenClose.class.getName()).log(Level.SEVERE, null, e);
         }
         return con;
     }
