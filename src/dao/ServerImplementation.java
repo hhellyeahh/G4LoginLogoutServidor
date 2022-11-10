@@ -28,9 +28,11 @@ public class ServerImplementation implements LoginLogout {
     private Connection con = null;
     private ConnectionOpenClose conOpCl;
     private PreparedStatement stmt;
+    private PreparedStatement stmt2;
 
     private final String SEARCHUser = "SELECT * from retologinlogout.user where login = ? and userPassword = ?";
     private final String UserEXISTS = "SELECT * from retologinlogout.user where login = ?";
+    private final String INSERTLogin = "{CALL insertLogin(?)}";
     private final String CREATEUserSQL = "{CALL createUser(?,?,?,?,?,?)}";
 
     private static final ResourceBundle CONFIG = ResourceBundle.getBundle("config.config");
@@ -92,9 +94,15 @@ public class ServerImplementation implements LoginLogout {
             } else {
                 throw new IncorrectLoginException("Incorrect login");
             }
+            // una vez comprobado de que exista insertamos el login
 
-            rs.close();
+            stmt2 = con.prepareCall(INSERTLogin);
+            stmt2.setString(1, loginUser.getLogin());
+            stmt2.execute();
+
+            stmt2.close();
             stmt.close();
+
             pool.returnConnection(con);
 
         } catch (SQLException ex) {

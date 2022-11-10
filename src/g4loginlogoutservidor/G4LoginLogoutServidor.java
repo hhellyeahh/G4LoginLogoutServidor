@@ -23,7 +23,7 @@ import java.util.logging.Logger;
 
 /**
  *
- * @author unaiz, gontzal
+ * @author unaiz
  *
  */
 public class G4LoginLogoutServidor extends Thread {
@@ -33,7 +33,7 @@ public class G4LoginLogoutServidor extends Thread {
     private final Integer MAXUSERS = Integer.parseInt(configFile.getString("MAXUSERS"));
     private static Boolean serverRunning = true;
     private static ServerSocket skServidor;
-    protected static ArrayList<SocketConnectionThread> actualConections = new ArrayList<>();
+    protected static Integer howMuchClients = 0;
 
     /**
      *
@@ -46,7 +46,7 @@ public class G4LoginLogoutServidor extends Thread {
             // BUCLE 
             while (serverRunning) {
                 //Preguntar si no ha superado el limite
-                if (actualConections.size() < MAXUSERS) {
+                if (howMuchClients < MAXUSERS) {
                     //Accept connection
                     skCliente = skServidor.accept();
                     //Crear hilo pasándole el Socket skCliente
@@ -80,14 +80,14 @@ public class G4LoginLogoutServidor extends Thread {
         serverRunning = serverRunning;
     }
 
-    //metodo para meter el hilo del usuario del array que se llama al terminar el DAO
+    //incrementa el numero de usuarios conectados, se sinroniza para que el integer se incremente en paralelo
     public static synchronized void addClient(SocketConnectionThread socketConnectionThread) {
-        actualConections.add(socketConnectionThread);
+        howMuchClients++;
     }
 
-    //metodo para quitar el hilo del usuario del array que se llama al terminar el DAO
+    //drecrementa el numero de usuarios conectados, se sinroniza para que el integer baje en paralelo
     public static synchronized void removeClient(SocketConnectionThread socketConnectionThread) {
-        actualConections.remove(socketConnectionThread);
+        howMuchClients--;
     }
 
     /**
@@ -96,15 +96,10 @@ public class G4LoginLogoutServidor extends Thread {
      * @throws IOException
      */
     public static void closeServer() throws SQLException, IOException {
-        if (actualConections.size() > 0) {
+        if (howMuchClients > 0) {
             Pool pool = Pool.getPool();
             pool.closePool();
 
-            for (SocketConnectionThread t : actualConections) {
-                t.close();
-                t.interrupt();
-                removeClient(t);
-            }
         }
         skServidor.close();
     }

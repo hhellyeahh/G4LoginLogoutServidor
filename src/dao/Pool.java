@@ -65,6 +65,11 @@ public class Pool {
      * @throws SQLException
      */
     public void closePool() throws SQLException {
-        stack.clear();
+        Connection toCleanConnection = null;
+        for (int i = 0; i <= stack.size(); i++) {
+            toCleanConnection = stack.pop();
+            toCleanConnection.close();
+        }
+
     }
 }

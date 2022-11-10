@@ -11,7 +11,7 @@ import java.util.logging.Logger;
 
 /**
  *
- * @author unaiz, gontzal
+ * @author unaiz
  */
 public class App extends Thread {
 
@@ -27,11 +27,11 @@ public class App extends Thread {
             LOGGER.info("ESCRIBA EXIT PARA CERRAR EL SERVER");
             if (new Scanner(System.in).next().trim().equalsIgnoreCase("EXIT")) {
                 server.setServerOn(false);
-                server.interrupt();
+                server.interrupt(); // interrumpe el hilo
                 on = false;
+                System.exit(0);
             }
         }
         LOGGER.info("Servidor cerrado");
-        Runtime.getRuntime().halt(0);
     }
 }
