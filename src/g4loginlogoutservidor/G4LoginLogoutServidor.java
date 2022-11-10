@@ -8,7 +8,7 @@ package g4loginlogoutservidor;
 import classes.Message;
 import classes.Type;
 import dao.Pool;
-import exceptions.UnknownModelTypeException;
+import exceptions.UnknownTypeException;
 import factories.FactoryServer;
 import hilos.SocketConnectionThread;
 import java.io.IOException;
@@ -16,7 +16,6 @@ import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -68,7 +67,7 @@ public class G4LoginLogoutServidor extends Thread {
 
         } catch (IOException ex) {
             Logger.getLogger(G4LoginLogoutServidor.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (UnknownModelTypeException ex) {
+        } catch (UnknownTypeException ex) {
             Logger.getLogger(G4LoginLogoutServidor.class.getName()).log(Level.SEVERE, null, ex);
         } catch (SQLException ex) {
             Logger.getLogger(G4LoginLogoutServidor.class.getName()).log(Level.SEVERE, null, ex);

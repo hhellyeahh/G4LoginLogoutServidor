@@ -5,7 +5,6 @@
  */
 package g4loginlogoutservidor;
 
-import static java.lang.System.exit;
 import java.util.Scanner;
 import java.util.logging.Logger;
 

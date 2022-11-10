@@ -7,7 +7,7 @@ package factories;
 
 import dao.ServerImplementation;
 import classes.LoginLogout;
-import exceptions.UnknownModelTypeException;
+import exceptions.UnknownTypeException;
 
 /**
  *
@@ -22,7 +22,7 @@ public class FactoryServer {
      *
      * @return data LoginLogout
      */
-    public static LoginLogout getLoginLogout() throws UnknownModelTypeException {
+    public static LoginLogout getLoginLogout() throws UnknownTypeException {
         data = new ServerImplementation();
         return data;
     }
