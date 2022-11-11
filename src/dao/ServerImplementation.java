@@ -20,7 +20,7 @@ import java.util.logging.Logger;
 
 /**
  *
- * @author Zuli & Unai B
+ * @author Zuli&UnaiB
  */
 public class ServerImplementation implements LoginLogout {
 
@@ -48,11 +48,11 @@ public class ServerImplementation implements LoginLogout {
 
     /**
      *
-     * @param user
-     * @return
-     * @throws IncorrectLoginException
-     * @throws ServerException
-     * @throws UnknownTypeException
+     * @param user it recieves the user in order to make the select in the database
+     * @return it returns the user with full information after the login is correct
+     * @throws IncorrectLoginException this exception is throw if the login is incorrect
+     * @throws ServerException this exception is throw if the are any problem with the server
+     * @throws UnknownTypeException this exception will be catched if the type of the message is incorrect
      */
     @Override
     public User logIn(User user) throws IncorrectLoginException, ServerException, UnknownTypeException {
@@ -103,7 +103,7 @@ public class ServerImplementation implements LoginLogout {
             stmt2.close();
             stmt.close();
 
-            pool.returnConnection(con);
+            pool.returnConnection(con); // returns the conection to the pool
 
         } catch (SQLException ex) {
             Logger.getLogger(ServerImplementation.class.getName()).log(Level.SEVERE, null, ex);
@@ -115,11 +115,11 @@ public class ServerImplementation implements LoginLogout {
 
     /**
      *
-     * @param user
-     * @return
-     * @throws ServerException
-     * @throws UserAlreadyExistExpection
-     * @throws UnknownTypeException
+     * @param user it recieves the user in order to make the insert in the database
+     * @return it returns the user after the register
+     * @throws ServerException this exception is throw if the are any problem with the server
+     * @throws UserAlreadyExistExpection this exception is catched if the user already exist in the database
+     * @throws UnknownTypeException this exception will be catched if the type of the message is incorrect 
      */
     @Override
     public User signUp(User user) throws ServerException, UserAlreadyExistExpection, UnknownTypeException {

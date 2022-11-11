@@ -8,7 +8,6 @@ package g4loginlogoutservidor;
 import classes.Message;
 import classes.Type;
 import dao.Pool;
-import exceptions.UnknownTypeException;
 import factories.FactoryServer;
 import hilos.SocketConnectionThread;
 import java.io.IOException;
@@ -22,7 +21,7 @@ import java.util.logging.Logger;
 
 /**
  *
- * @author unaiz
+ * @author unaizGontzal
  *
  */
 public class G4LoginLogoutServidor extends Thread {
@@ -35,7 +34,10 @@ public class G4LoginLogoutServidor extends Thread {
     protected static Integer howMuchClients = 0;
 
     /**
-     *
+     * The run method will be on a infinte loop until a admin close the server,
+     * it will take user petitions and create a separate thread from each one of them
+     * until a maximum of 10 users, it there are more than 10 users petitions at the same time,
+     * we will return a message to the client saying that the server cant handle more petitions
      */
     public void run() {
 
@@ -50,8 +52,8 @@ public class G4LoginLogoutServidor extends Thread {
                     skCliente = skServidor.accept();
                     //Crear hilo pasándole el Socket skCliente
                     SocketConnectionThread socketConnectionThread = new SocketConnectionThread(skCliente, FactoryServer.getLoginLogout());
-                    //Añadimos hilo all array 
-                    addClient(socketConnectionThread);
+                    //incrementamos el numero de clientes 
+                    addClient();
                 } else {
                     //aceptamos conection             
                     skCliente = skServidor.accept();
@@ -67,32 +69,40 @@ public class G4LoginLogoutServidor extends Thread {
 
         } catch (IOException ex) {
             Logger.getLogger(G4LoginLogoutServidor.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (UnknownTypeException ex) {
-            Logger.getLogger(G4LoginLogoutServidor.class.getName()).log(Level.SEVERE, null, ex);
         } catch (SQLException ex) {
             Logger.getLogger(G4LoginLogoutServidor.class.getName()).log(Level.SEVERE, null, ex);
         }
 
     }
-
+/**
+ * this method will set the server off when its called from the main 
+ * @param serverRunning  a boolean to stop the server
+ */
     public static void setServerOn(boolean serverRunning) {
         serverRunning = serverRunning;
     }
 
-    //incrementa el numero de usuarios conectados, se sinroniza para que el integer se incremente en paralelo
-    public static synchronized void addClient(SocketConnectionThread socketConnectionThread) {
+   
+    /**
+     * incrementa el numero de usuarios conectados, se sinroniza para que el integer se incremente en paralelo
+     *
+     */
+    public static synchronized void addClient() {
         howMuchClients++;
     }
 
-    //drecrementa el numero de usuarios conectados, se sinroniza para que el integer baje en paralelo
-    public static synchronized void removeClient(SocketConnectionThread socketConnectionThread) {
+
+    /**
+     *  drecrementa el numero de usuarios conectados, se sinroniza para que el integer baje en paralelo
+     */
+    public static synchronized void removeClient() {
         howMuchClients--;
     }
 
     /**
      *
-     * @throws SQLException
-     * @throws IOException
+     * @throws SQLException it throws a SQLException if the are any of them
+     * @throws IOException every other excpetions will be handle by the IOException
      */
     public static void closeServer() throws SQLException, IOException {
         if (howMuchClients > 0) {
@@ -100,7 +110,7 @@ public class G4LoginLogoutServidor extends Thread {
             pool.closePool();
 
         }
-        skServidor.close();
+        skServidor.close(); //close the server sockets
     }
 
 }

@@ -4,3 +4,7 @@
  * and open the template in the editor.
  */
 package config;
+
+/**
+ * this package contains the config file for the server
+ */

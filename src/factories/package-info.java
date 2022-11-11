@@ -4,3 +4,6 @@
  * and open the template in the editor.
  */
 package factories;
+/**
+ * this package contais the factory that returns the server implementation
+ */

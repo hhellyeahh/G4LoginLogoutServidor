@@ -17,7 +17,7 @@ import java.util.logging.Logger;
 
 /**
  *
- * @author unaiz
+ * @author unaizGontzal
  *
  */
 public class SocketConnectionThread extends Thread {
@@ -31,14 +31,22 @@ public class SocketConnectionThread extends Thread {
 
     public SocketConnectionThread() {
     }
-
+    /**
+     * 
+     * @param skCLiente the sockect of the client that makes the petition
+     * @param dao the interface implementation in order to be used
+     */
     public SocketConnectionThread(Socket skCLiente, LoginLogout dao) {
         this.skCliente = skCLiente;
         this.dao = dao;
-        this.start();
+        this.start(); //starts the trhead
     }
-
+    
     @Override
+    /**
+     * it will get the object from the client socket and interpretate the recieved
+     * message type in order to make a login or a register
+     */
     public void run() {
         try {
 //RECIBO  
@@ -68,19 +76,19 @@ public class SocketConnectionThread extends Thread {
             //Write response message
             msg.setCallType(Type.OKAY_RESPONSE);
             msg.setUser(user);
-
-        } catch (IncorrectLoginException e) {
+            
+        } catch (IncorrectLoginException e) { //if the are any error with the login the returned message will be this
             msg.setCallType(Type.INCORRECT_LOGIN_RESPONSE);
-        } catch (UserAlreadyExistExpection e) {
+        } catch (UserAlreadyExistExpection e) { //if the user already exist the returned message will be this
             msg.setCallType(Type.USER_ALREADY_EXIST_RESPONE);
-        } catch (Exception e) {
+        } catch (Exception e) { //any other error it will be returned with a server error
             msg.setCallType(Type.SERVER_ERROR_RESPONSE);
         } finally {
             try {
                 outputStream.writeObject(msg);
                 outputStream.close();
                 inputStream.close();
-                G4LoginLogoutServidor.removeClient(this);
+                G4LoginLogoutServidor.removeClient(); // the syncronized method of the server is static so it will revome this client from it
                 skCliente.close();
             } catch (IOException ex) {
                 Logger.getLogger(G4LoginLogoutServidor.class.getName()).log(Level.SEVERE, null, ex);
@@ -88,7 +96,10 @@ public class SocketConnectionThread extends Thread {
         }
 
     }
-
+/**
+ * it will close all from this client 
+ * @throws IOException 
+ */
     public void close() throws IOException {
         if (!skCliente.isClosed()) {
             if (inputStream != null) {

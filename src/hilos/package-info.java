@@ -4,3 +4,7 @@
  * and open the template in the editor.
  */
 package hilos;
+/**
+ * this thread is the one that is created for each user, it will recieve the message
+ * and call the designated method from the dao and return information
+ */
