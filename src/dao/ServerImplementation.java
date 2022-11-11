@@ -20,7 +20,7 @@ import java.util.logging.Logger;
 
 /**
  *
- * @author Zuli&UnaiB
+ * @author ZuliUnaiB
  */
 public class ServerImplementation implements LoginLogout {
 
