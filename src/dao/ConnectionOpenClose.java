@@ -7,7 +7,7 @@ package dao;
 
 /**
  *
- * @author 2dam
+ * @author zuli
  */
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -25,13 +25,19 @@ public class ConnectionOpenClose {
     protected String pass;
     protected Connection con;
 
+    /**
+     * this method takes all the necessary info from the config file in order to create a conection
+     */
     public ConnectionOpenClose() {
         configFile = ResourceBundle.getBundle("config.config");
         url = configFile.getString("URL");
         user = configFile.getString("USER");
         pass = configFile.getString("PASSWORD");
     }
-
+/**
+ * this methods creates a connection ussing the necessary info
+ * @return returns a usable conections
+ */
     public Connection openConnection() {
         Connection con = null;
         try {
@@ -41,7 +47,12 @@ public class ConnectionOpenClose {
         }
         return con;
     }
-
+/**
+ * this method is used for closing the coneection
+ * @param stmt the msq stmt is recieved in order to close it
+ * @param con the used coneection is recieved in order to close it
+ * @throws SQLException 
+ */
     public void closeConnection(PreparedStatement stmt, Connection con) throws SQLException {
         if (stmt != null) {
             stmt.close();

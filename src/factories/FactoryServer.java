@@ -11,18 +11,18 @@ import exceptions.UnknownTypeException;
 
 /**
  *
- * @author Leire, Zulu
+ * @author ZuluLeire
  */
 public class FactoryServer {
 
     private static LoginLogout data;
 
     /**
-     * Load the data variable, if it is not previously loaded
+     * Load the data variable, with the server implementation
      *
-     * @return data LoginLogout
+     * @return data LoginLogout returns the server implementation of the inteface 
      */
-    public static LoginLogout getLoginLogout() throws UnknownTypeException {
+    public static LoginLogout getLoginLogout(){
         data = new ServerImplementation();
         return data;
     }
